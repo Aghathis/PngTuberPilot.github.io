@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>PNG tuber pilot</title>
+		<style>
+		body{
+			margin:0;padding:0;
+			height:100vh; width:100vw;
+			background-color:#FCE;
+			font-family: sans-serif;
+			color:#555;
+		}
+		.canvas{
+			width:480px;height:480px;background-color:#bf8;padding:64px;
+		}
+		
+		.canvas *{
+			position:fixed;
+		}
+		
+
+		.canvasright{
+			flex-grow:1;
+			max-height:608px;
+			overflow-y:scroll;
+		}
+		
+		.inputgroup{
+			box-shadow: 0px -1px 10px -2px #751d4866;
+			border-radius:20px;
+			margin-top:10px;
+			padding:10px;
+			display:flex;
+		}
+		
+		
+		.categButton{
+			margin-right:20px;
+		}
+				
+		.categorieimage{
+			width:48px;
+			border-radius:64px;
+		}
+		
+		.showcategories{
+			position:sticky;
+			top:0;
+			backdrop-filter : blur(20px);
+			box-shadow: 0px -2px 10px 5px #751d4822;
+		}
+		
+		img{
+			width:480px;
+		}
+		
+		.homepage {
+			background-color:#FFFFFF88;
+			border-radius:10px;
+			
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+			padding:20px;
+			box-shadow: 10px 5px 20px 10px #751d4822;
+		}
+		
+		.uploadArea{
+			padding:50px;
+			border:4px dashed #00000055;
+			border-radius:10px;
+			text-align:center;
+			font-size:32px;
+			cursor:pointer;
+			background-color:none;
+			transition:background-color 0.5s, padding 0.5s;
+		}
+		
+		.uploadAreaOnDrag{
+			background-color:#FFFFFF88;
+			transition:background-color 0.5s, padding 0.5s;
+			padding:100px;
+		}
+		
+		</style>
+		<link href='style.css' rel="stylesheet">
+		
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script src="perlin.js"></script>
+	</head>
+	<body>
+		<div class='homepage'>
+				<div style='width:100%;font-size:48px'>
+					PNG tuber pilot
+				</div>
+				<div style='font-size:16px;color:#777;'>by Shannon Egoiste</div>
+				<div style='border-bottom:1px solid #666;margin-top:20px;margin-bottom:20px'></div>
+				<div class='uploadArea' onclick='$(".configfileuploader").trigger("click")'>
+					click or Drop your config file
+				</div>
+				<input type='file' class='configfileuploader d-none' onchange='loadConfigFile(this)' accept='.json' multiple='false'/>
+				<div style='font-size:16px;padding-top:10px;'>
+					cette web app fonctionne entiérement en local aucune donnée n'est uploader ou retenue nul part !
+				</div>
+		</div>
+		<div class='d-none app_tuber' style="display:flex;">
+			<div>
+				<div class="canvas"></div>
+			</div>
+			<div class="canvasright">
+				<div class="showcategories" style='padding:10px'><button class="customTab selected categButton" onclick="categSelect(this,undefined)">tout afficher</button></div>
+				<div class="optionContainer" style='padding:10px'>
+				
+				</div>
+			</div>
+		</div>	
+		
+		<script src="tools.js"></script>
+		<script>
+			$(document).ready(function(){
+				$(".uploadArea").on("mouseenter dragenter",function(e){
+					$(".uploadArea").addClass("uploadAreaOnDrag");
+				});
+				
+				$(".uploadArea").on("mouseleave dragleave",function(e){
+					$(".uploadArea").removeClass("uploadAreaOnDrag");
+				});
+				
+				$(".uploadArea").on("dragover",function(e){e.preventDefault();})
+				
+				$(".uploadArea").on("drop dragdrop ",function(e){
+					e.preventDefault();  
+					e.stopImmediatePropagation();
+					e.dataTransfer = e.originalEvent.dataTransfer;
+					if (e.dataTransfer.items[0].kind === 'file') {
+						var file = e.dataTransfer.items[0].getAsFile();
+						loadConfigFile(file);
+					}
+													
+					
+				});
+				
+				
+			});
+			
+			function loadConfigFile(file){
+				if(file.files){
+					file = file.files[0];
+				}
+				
+				var fr=new FileReader();
+				fr.readAsText(file);
+				fr.onload=function(){
+					creation(JSON.parse(fr.result));
+				}
+			}
+			
+			function creation(data){
+				$(".app_tuber").removeClass("d-none");
+				$(".homepage").addClass("d-none");
+				
+				var sprites = [];
+				data.settings.forEach(function(spriteInfo){
+					var sprite = new Sprite();
+					sprite.createFromInfo(spriteInfo,".optionContainer",data.basePath);
+					sprites.push(sprite);
+				});
+
+				if(sprites != undefined){
+					setInterval(function(){
+						sprites.forEach(function(sprite){
+							sprite.update(16.67);
+						});	
+					},16.67);
+				}
+			}
+			
+		</script>
+	</body>
+</html>
