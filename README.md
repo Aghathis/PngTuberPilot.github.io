@@ -1,2 +1,2 @@
-# ShaEgoPngTuberPilot.github.io
+# PngTuberPilot.github.io
 web application to Pilot Png Tuber
