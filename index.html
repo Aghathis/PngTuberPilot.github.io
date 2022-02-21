@@ -88,6 +88,7 @@
 		<link href='style.css' rel="stylesheet">
 		
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
 		<script src="perlin.js"></script>
 	</head>
 	<body>
@@ -100,7 +101,7 @@
 				<div class='uploadArea' onclick='$(".configfileuploader").trigger("click")'>
 					click or Drop your config file
 				</div>
-				<input type='file' class='configfileuploader d-none' onchange='loadConfigFile(this)' accept='.json' multiple='false'/>
+				<input type='file' class='configfileuploader d-none' onchange='loadConfigFile(this)' accept='.zip' multiple='false'/>
 				<div style='font-size:16px;padding-top:10px;'>
 					cette web app fonctionne entiérement en local aucune donnée n'est uploader ou retenue nul part !
 				</div>
@@ -138,33 +139,50 @@
 						var file = e.dataTransfer.items[0].getAsFile();
 						loadConfigFile(file);
 					}
-													
-					
 				});
-				
-				
 			});
 			
 			function loadConfigFile(file){
-				if(file.files){
-					file = file.files[0];
-				}
-				
-				var fr=new FileReader();
-				fr.readAsText(file);
-				fr.onload=function(){
-					creation(JSON.parse(fr.result));
-				}
+				if(file.files) file = file.files[0];
+			
+				JSZip.loadAsync(file).then(function (zip) {
+					var promises = Object.keys(zip.files).map(function(fileName){
+					    var file = zip.files[fileName];
+						return file.async("blob").then(function (blob) {
+							var fileData = "";
+							if(fileName.indexOf(".png") > 0){
+								fileData = URL.createObjectURL(blob)
+							}else if(fileName.indexOf(".json") > 0){
+								fileData = blob.text();
+							}
+							
+							return [fileName,fileData];
+						});
+					});
+					
+					return Promise.all(promises);
+				}).then(function(result){
+					var allData = {};
+					result.forEach(function(elem){
+						allData[elem[0]] = elem[1];
+					});
+					
+					creation(allData);
+				});
 			}
 			
-			function creation(data){
+			async function creation(data){
 				$(".app_tuber").removeClass("d-none");
 				$(".homepage").addClass("d-none");
 				
+				var settings = await data["param.json"].then(function(filepromise){
+					return JSON.parse(filepromise);
+				});
+
 				var sprites = [];
-				data.settings.forEach(function(spriteInfo){
+				settings.forEach(function(spriteInfo){
 					var sprite = new Sprite();
-					sprite.createFromInfo(spriteInfo,".optionContainer",data.basePath);
+					sprite.createFromInfo(spriteInfo,".optionContainer",data);
 					sprites.push(sprite);
 				});
 

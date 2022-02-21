@@ -45,25 +45,23 @@ function categSelect(dom,type){
 	$(".categButton").removeClass('selected');
 	$(dom).addClass('selected');
 }
-		
+	
 class Sprite{
 	constructor(){
 		this.#dom = $("<div class='spriteframe'></div>").appendTo(".canvas");
 	}
 	
-	createFromInfo(spriteInfo,container,basepath){		
+	createFromInfo(spriteInfo,container,img){		
 		var self = this;
 		
-		if(spriteInfo.base != undefined) this.addBase(spriteInfo.base,basepath);
+		if(spriteInfo.base != undefined) this.addBase(spriteInfo.base,img);
 		if(spriteInfo.name != undefined){ 
 			$(container).append(`<div class='inputgroup inputgroup_`+spriteInfo.name+` inputtype_`+spriteInfo.type+`'></div>`);		
-			if(spriteInfo.categorieImage != undefined){
-				$(".inputgroup_"+spriteInfo.name).append("<div><img src='"+basepath+spriteInfo.categorieImage+"' class='categorieimage'></img></div>");
+			if(spriteInfo.categorieImage != undefined){				
+				$(".inputgroup_"+spriteInfo.name).append("<div><img src='"+img[spriteInfo.categorieImage]+"' class='categorieimage'></img></div>");
 			}
 			$(".inputgroup_"+spriteInfo.name).append("<div class='input_"+spriteInfo.name+"' style='margin:auto 20px;display:flex;'></div>");		
 		}
-
-		
 		
 		if(spriteInfo.layer != undefined){
 			var select = "<div><select class='customSelect'>";
@@ -77,9 +75,9 @@ class Sprite{
 				
 				var htmlparam = "";
 				if(spriteInfoLayer.param.find(elem => elem == "animated")){
-					self.addAnimation(spriteInfoLayer.name,spriteInfoLayer.frames,basepath);
+					self.addAnimation(spriteInfoLayer.name,spriteInfoLayer.frames,img);
 				}else{
-					self.addLayer(spriteInfoLayer.name,spriteInfoLayer.path,basepath);
+					self.addLayer(spriteInfoLayer.name,spriteInfoLayer.path,img);
 				}
 				if(spriteInfoLayer.param.find(elem => elem == "autowiggle")){
 					htmlparam += " data-wiggle='true'";
@@ -128,21 +126,36 @@ class Sprite{
 		}
 	}
 	
-	addBase(path,basepath){
-		$(this.#dom).append("<img class='sprite_base' src='"+basepath+path+"'></img>");
+	addBase(path,img){
+		if(img[path] == undefined){
+			console.log(path);
+			return;
+		}
+			
+		$(this.#dom).append("<img class='sprite_base' src='"+img[path]+"'></img>");
 	}
 	
-	addLayer(id,path,basepath){
-		$(this.#dom).append("<img class='d-none sprite_layer sprite_"+id+"' src='"+basepath+path+"'></img>");
+	addLayer(id,path,img){	
+		if(img[path] == undefined){
+			console.log(path);
+			return;
+		}
+	
+		$(this.#dom).append("<img class='d-none sprite_layer sprite_"+id+"' src='"+img[path]+"'></img>");
 	}
 	
-	addAnimation(id,frames,basepath){
+	addAnimation(id,frames,img){
 		this.#animated = true;
 		$(this.#dom).append("<div class='d-none sprite_layer animated_sprite sprite_"+id+"'></div>");		
 		var key = 0;
-		frames.forEach(function(frame,i){
+		frames.forEach(function(frame,i){			
+			if(img[frame.path] == undefined){
+				console.log(frame.path);
+				return;
+			}
+			
 			key+=frame.duration;
-			$(".sprite_"+id).append("<img class='d-none' data-key='"+key+"' src='"+basepath+frame.path+"'></img>");
+			$(".sprite_"+id).append("<img class='d-none' data-key='"+key+"' src='"+img[frame.path]+"'></img>");
 		});
 		$(".sprite_"+id).data("animation_duration",key);
 	}
