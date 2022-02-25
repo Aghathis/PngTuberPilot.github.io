@@ -3,93 +3,58 @@
 	<head>
 		<meta charset="utf-8">
 		<title>PNG tuber pilot</title>
-		<style>
-		body{
-			margin:0;padding:0;
-			height:100vh; width:100vw;
-			background-color:#FCE;
-			font-family: sans-serif;
-			color:#555;
-		}
-		.canvas{
-			width:480px;height:480px;background-color:#bf8;padding:64px;
-		}
-		
-		.canvas *{
-			position:fixed;
-		}
-		
-
-		.canvasright{
-			flex-grow:1;
-			max-height:608px;
-			overflow-y:scroll;
-		}
-		
-		.inputgroup{
-			box-shadow: 0px -1px 10px -2px #751d4866;
-			border-radius:20px;
-			margin-top:10px;
-			padding:10px;
-			display:flex;
-		}
-		
-		
-		.categButton{
-			margin-right:20px;
-		}
+		<link href='style/style.css' rel="stylesheet">
+		<link href='style/homepage_style.css' rel="stylesheet">
+		<style>	
+			body{
+				margin:0;padding:0;
+				height:100vh;width:100vw;
+				background-color:#FCE;
+				font-family: sans-serif;color:#555;
+			}
 				
-		.categorieimage{
-			width:48px;
-			border-radius:64px;
-		}
+			img{width:480px;}
+			.canvas{width:480px;height:480px;background-color:#bf8;padding:64px;}
+			.canvas *{position:fixed;}
 		
-		.showcategories{
-			position:sticky;
-			top:0;
-			backdrop-filter : blur(20px);
-			box-shadow: 0px -2px 10px 5px #751d4822;
-		}
-		
-		img{
-			width:480px;
-		}
-		
-		.homepage {
-			background-color:#FFFFFF88;
-			border-radius:10px;
+			.canvasright{
+				flex-grow:1;
+			}
 			
-			position: absolute;
-			left: 50%;
-			top: 50%;
-			transform: translate(-50%, -50%);
-			padding:20px;
-			box-shadow: 10px 5px 20px 10px #751d4822;
-		}
-		
-		.uploadArea{
-			padding:50px;
-			border:4px dashed #00000055;
-			border-radius:10px;
-			text-align:center;
-			font-size:32px;
-			cursor:pointer;
-			background-color:none;
-			transition:background-color 0.5s, padding 0.5s;
-		}
-		
-		.uploadAreaOnDrag{
-			background-color:#FFFFFF88;
-			transition:background-color 0.5s, padding 0.5s;
-			padding:100px;
-		}
-		
+				
+			.modelSelecteur{
+				max-height:100vh;
+			}
+			
+			.inputgroup{
+				box-shadow: 0px -1px 10px -2px #751d4866;
+				border-radius:20px;
+				margin-top:10px;
+				padding:10px;
+				display:flex;
+				overflow:hidden;
+			}
+			
+			.categButton{
+				margin-right:20px;
+			}
+					
+			.categorieimage{
+				width:48px;
+				border-radius:64px;
+			}
+			
+			.showcategories{
+				position:sticky;
+				top:0;
+				backdrop-filter : blur(20px);
+				box-shadow: 2px 2px 10px 5px #751d4822;
+			}
+			
 		</style>
-		<link href='style.css' rel="stylesheet">
 		
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
-		<script src="perlin.js"></script>
 	</head>
 	<body>
 		<div class='homepage'>
@@ -103,22 +68,26 @@
 				</div>
 				<input type='file' class='configfileuploader d-none' onchange='loadConfigFile(this)' accept='.zip' multiple='false'/>
 				<div style='font-size:16px;padding-top:10px;'>
-					this app does not save any data, everything work in client side !
+					cette web app fonctionne entiérement en local aucune donnée n'est uploader ou retenue nul part !
 				</div>
 		</div>
+		
 		<div class='d-none app_tuber' style="display:flex;">
 			<div>
 				<div class="canvas"></div>
 			</div>
 			<div class="canvasright">
-				<div class="showcategories" style='padding:10px'><button class="customTab selected categButton" onclick="categSelect(this,undefined)">tout afficher</button></div>
-				<div class="optionContainer" style='padding:10px'>
-				
-				</div>
+					<div class='modelSelecteur' style='overflow-y:scroll;'>
+						<div class="showcategories" style='padding:10px'><button class="customTab selected categButton" onclick="categSelect(this,undefined)">tout afficher</button></div>
+						<div class="optionContainer" style='padding:10px'></div>
+					</div>
 			</div>
 		</div>	
 		
-		<script src="tools.js"></script>
+
+		<script src="script/perlin.js"></script>
+		<script src="script/microphone.js"></script>
+		<script src="script/tools.js"></script>
 		<script>
 			$(document).ready(function(){
 				$(".uploadArea").on("mouseenter dragenter",function(e){
@@ -187,9 +156,13 @@
 				});
 
 				if(sprites != undefined){
+					var microphone = new Microphone();
+					microphone.startRecord();
 					setInterval(function(){
+						microphone.update();
 						sprites.forEach(function(sprite){
 							sprite.update(16.67);
+							sprite.talk(microphone.getVolume() > 10);
 						});	
 					},16.67);
 				}
