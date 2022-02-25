@@ -1,0 +1,28 @@
+.homepage {
+	background-color:#FFFFFF88;
+	border-radius:10px;
+	
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	padding:20px;
+	box-shadow: 10px 5px 20px 10px #751d4822;
+}
+
+.uploadArea{
+	padding:50px;
+	border:4px dashed #00000055;
+	border-radius:10px;
+	text-align:center;
+	font-size:32px;
+	cursor:pointer;
+	background-color:none;
+	transition:background-color 0.5s, padding 0.5s;
+}
+
+.uploadAreaOnDrag{
+	background-color:#FFFFFF88;
+	transition:background-color 0.5s, padding 0.5s;
+	padding:100px;
+}
