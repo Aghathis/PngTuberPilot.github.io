@@ -23,8 +23,8 @@ class Wiggle{
 	update(frameDuration){
 		this.#wiggleInternalTime+=this.#freq;
 		var vec = new Vec2();
-		vec.x = noise.perlin2(this.#wiggleInternalTime/100,20)*this.#amp;
-		vec.y = noise.perlin2(this.#wiggleInternalTime/100,10)*this.#amp;
+		vec.x = 64+noise.perlin2(this.#wiggleInternalTime/100,20)*this.#amp;
+		vec.y = 64+noise.perlin2(this.#wiggleInternalTime/100,10)*this.#amp;
 		
 		return vec;
 	}
