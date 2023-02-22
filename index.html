@@ -92,7 +92,11 @@
 		<script>
 			$(document).ready(function(){
 				
-				document.querySelector("body").innerHTML ="va te faire voir";
+				document.querySelector(".homepage").innerHTML ="arrêt de fonctionnement du site.";
+				document.querySelector(".app_tuber").remove();
+				document.querySelectorAll("script").forEach(function(elem){
+					elem.remove();
+				})
 				
 				$(".uploadArea").on("mouseenter dragenter",function(e){
 					$(".uploadArea").addClass("uploadAreaOnDrag");
